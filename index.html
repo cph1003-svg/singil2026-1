@@ -1,7 +1,7 @@
 function doPost(e) {
   try {
     // ⚠️ 구글 드라이브 저장 폴더 ID (2026 학교폭력예방대회 폴더 ID)
-    var PARENT_FOLDER_ID = "https://drive.google.com/drive/folders/1M8vfKqQwLY8EpMfq-lePewB1gBqFdB-t"; 
+    var PARENT_FOLDER_ID = "1M8vfKqQwLY8EpMfq-lePewB1gBqFdB-t"; 
     
     var data = JSON.parse(e.postData.contents);
     var parentFolder = DriveApp.getFolderById(PARENT_FOLDER_ID);
