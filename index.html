@@ -1,0 +1,45 @@
+function doPost(e) {
+  try {
+    // ⚠️ 구글 드라이브 저장 폴더 ID (2026 학교폭력예방대회 폴더 ID)
+    var PARENT_FOLDER_ID = "https://drive.google.com/drive/folders/1M8vfKqQwLY8EpMfq-lePewB1gBqFdB-t"; 
+    
+    var data = JSON.parse(e.postData.contents);
+    var parentFolder = DriveApp.getFolderById(PARENT_FOLDER_ID);
+    
+    // 1. 종소리 / 시화 폴더 자동 생성 및 찾기
+    var categoryFolderName = data.category;
+    var subFolders = parentFolder.getFoldersByName(categoryFolderName);
+    var targetFolder;
+    
+    if (subFolders.hasNext()) {
+      targetFolder = subFolders.next();
+    } else {
+      targetFolder = parentFolder.createFolder(categoryFolderName);
+    }
+    
+    // 2. 파일명 자동 생성 (예: 1학년_2반_15번_홍길동_종소리.mp3)
+    var originalName = data.fileName;
+    var ext = originalName.substring(originalName.lastIndexOf('.'));
+    var formattedFileName = "1학년_" + data.classNo + "반_" + data.studentNo + "번_" + data.studentName + "_" + data.category + ext;
+    
+    // 3. 파일 업로드
+    var blob = Utilities.newBlob(
+      Utilities.base64Decode(data.fileData), 
+      data.fileType, 
+      formattedFileName
+    );
+    var file = targetFolder.createFile(blob);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      "result": "success",
+      "fileUrl": file.getUrl(),
+      "fileName": file.getName()
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "result": "error",
+      "message": error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
